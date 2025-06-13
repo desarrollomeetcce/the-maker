@@ -1,7 +1,7 @@
-import BookGenerator from "./book/components/book-generator";
+import FullBookGenerator from "./book/components/full-books-generator";
 
 export default function Home() {
   return (
-    <BookGenerator />
+    <FullBookGenerator />
   );
 }

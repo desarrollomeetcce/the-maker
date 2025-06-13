@@ -1,21 +1,23 @@
-// app/nuevo/page.tsx
 "use client";
 
 import { useState } from "react";
 import { TextField, Button, Typography, Card, CardContent, IconButton, CircularProgress, Backdrop } from "@mui/material";
 import { Add, Delete, PictureAsPdf } from "@mui/icons-material";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import {
   generateContentAction,
   generateCoverImageAction,
   generateSubtopicsAction,
 } from "../../application/Generate";
 
+import './styles.css';
+
+const MAX_CONCURRENT_REQUESTS = 3;
+
 const BookGenerator = () => {
   const [title, setTitle] = useState("");
   const [subtopics, setSubtopics] = useState<string[]>([]);
-  const [contents, setContents] = useState<string[]>([]);
+  const [contents, setContents] = useState<(string | null | "error")[]>([]);
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [loadingAll, setLoadingAll] = useState(false);
@@ -51,30 +53,43 @@ const BookGenerator = () => {
       const image = await generateCoverImageAction(title);
       setCoverImage(image);
 
-      if (subtopics.length === 0) {
+      let usedSubtopics = subtopics;
+      if (usedSubtopics.length === 0) {
         setStatus("Generando subtemas...");
-        const newSubtopics = await generateSubtopicsAction(title);
-        setSubtopics(newSubtopics);
-        setStatus("Generando contenido...");
-        const newContents: string[] = [];
-        for (const sub of newSubtopics) {
-          const content = await generateContentAction(sub, title);
-          newContents.push(content);
-        }
-        setContents(newContents);
-      } else {
-        setStatus("Generando contenido...");
-        const newContents: string[] = [];
-        for (const sub of subtopics) {
-          const content = await generateContentAction(sub, title);
-          newContents.push(content);
-        }
-        setContents(newContents);
+        usedSubtopics = await generateSubtopicsAction(title);
+        setSubtopics(usedSubtopics);
       }
 
-      setStatus("Todo listo");
+      setContents(Array(usedSubtopics.length).fill(null));
+      setStatus("Generando capítulos...");
+
+      let index = 0;
+
+      const queue = Array(MAX_CONCURRENT_REQUESTS).fill(null).map(async function runner() {
+        while (index < usedSubtopics.length) {
+          const i = index++;
+          try {
+            const content = await generateContentAction(usedSubtopics[i], title);
+            setContents(prev => {
+              const updated = [...prev];
+              updated[i] = content;
+              return updated;
+            });
+          } catch (e) {
+            console.error(`Error generando subtema ${i + 1}:`, e);
+            setContents(prev => {
+              const updated = [...prev];
+              updated[i] = "error";
+              return updated;
+            });
+          }
+        }
+      });
+
+      await Promise.all(queue);
+      setStatus("Todo listo.");
     } catch (error) {
-      console.error("Error generando libro completo:", error);
+      console.error("Error generando el libro completo:", error);
       setStatus("Error generando el libro");
     } finally {
       setLoadingAll(false);
@@ -156,14 +171,12 @@ const BookGenerator = () => {
               </div>
             )}
 
-
-
             {contents.map((content, index) => (
               <div
                 key={index}
                 className="px-16 pb-24"
                 style={{
-                  ...(index > 0 ? { pageBreakBefore: "always" } : {}), // Solo del 2 en adelante
+                  ...(index > 0 ? { pageBreakBefore: "always" } : {}),
                 }}
               >
                 <Typography
@@ -171,26 +184,22 @@ const BookGenerator = () => {
                   align="center"
                   sx={{ fontWeight: "bold", marginBottom: "3rem" }}
                 >
-                  {`${subtopics[index]}`}
+                  {subtopics[index]}
                 </Typography>
 
-                <Typography
-                  variant="body1"
-                  sx={{
-                    textAlign: "justify",
-                    textIndent: "2rem",
-                    lineHeight: "2rem",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {content}
-                </Typography>
+                {content === null ? (
+                  <div className="text-center text-gray-500 italic">Generando contenido...</div>
+                ) : content === "error" ? (
+                  <div className="text-center text-red-500 italic">Error generando este capítulo.</div>
+                ) : (
+                  <div
+                    className="prose max-w-none text-justify"
+                    dangerouslySetInnerHTML={{ __html: content }}
+                  ></div>
+                )}
               </div>
             ))}
-
-
           </div>
-
         </div>
       </div>
 
@@ -203,7 +212,7 @@ const BookGenerator = () => {
         >
           {loadingAll ? <CircularProgress size={24} color="inherit" /> : "Generar"}
         </Button>
-        {contents.length > 0 && (
+        {contents.filter(c => typeof c === "string").length > 0 && (
           <Button
             variant="contained"
             color="secondary"
