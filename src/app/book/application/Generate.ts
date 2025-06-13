@@ -198,12 +198,17 @@ export async function generateFullBookAction(
         text-align: justify;
         margin-bottom: 1.2rem;
       }
-      .image-placeholder {
+
+      ${includeImages
+        && 
+        `.image-placeholder {
         height: 300px;
         margin: 2rem 0;
         background-color: #eee;
         border: 1px dashed #aaa;
+      }`
       }
+    
     </style>
   </head>
   <body>
