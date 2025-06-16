@@ -1,55 +1,105 @@
-// app/book-library/page.tsx
 "use client";
 
 import { useState } from "react";
-import { TextField, Button, Typography, Card, CardContent, CircularProgress, Link, Box, FormControlLabel, Checkbox } from "@mui/material";
+import { TextField, Button, Typography, Card, CardContent, CircularProgress, Link, Box, FormControlLabel, Checkbox, IconButton } from "@mui/material";
 import { v4 as uuidv4 } from 'uuid';
 import { generateSubtopicsAction, generateFullBookAction } from "../../application/Generate";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
 const FullBookGenerator = () => {
   const [title, setTitle] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loadingSubtopics, setLoadingSubtopics] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const [results, setResults] = useState<{ subtopic: string; url: string }[]>([]);
   const [includeImages, setIncludeImages] = useState(false);
+  const [topicId, setTopicId] = useState<string | null>(null);
+  const [topicSlug, setTopicSlug] = useState<string | null>(null);
+  const [results, setResults] = useState<{
+    subtopic: string;
+    url: string;
+    loading: boolean;
+    generated: boolean;
+  }[]>([]);
 
-  const handleGenerate = async () => {
+  const handleGenerateSubtopics = async () => {
     if (!title.trim()) {
-      setStatus("Escribe un título para generar los libros.");
+      setStatus("Escribe un título para generar los subtemas.");
       return;
     }
 
-    setLoading(true);
+    setLoadingSubtopics(true);
     setStatus("Generando subtemas...");
     setResults([]);
 
     try {
       const subtopics = await generateSubtopicsAction(title);
-      const topicId = uuidv4();
-      const topicSlug = title.toLowerCase().replace(/[^\w\d]+/g, '-');
-      const resultArray: { subtopic: string; url: string }[] = subtopics.map((sub, i) => {
+      const newTopicId = uuidv4();
+      const newTopicSlug = title.toLowerCase().replace(/[^\w\d]+/g, '-');
+
+      setTopicId(newTopicId);
+      setTopicSlug(newTopicSlug);
+
+      const resultArray = subtopics.map((sub, i) => {
         const tomo = i + 1;
-        const fileSlug = `Tomo-${tomo}-${topicSlug}-${sub}`.toLowerCase().replace(/[^\w\d]+/g, '-');
-        const url = `/generated/${topicId}/${fileSlug}.html`;
-        return { subtopic: sub, url };
+        const fileSlug = `Tomo-${tomo}-${newTopicSlug}-${sub}`.toLowerCase().replace(/[^\w\d]+/g, '-');
+        const url = `/generated/${newTopicId}/${fileSlug}.html`;
+        return { subtopic: sub, url, loading: false, generated: false };
       });
 
       setResults(resultArray);
-      setStatus("Generando libros...");
-
-      let count = 0;
-      for (const sub of subtopics) {
-        count++;
-        const fileSlug = `Tomo-${count}-${topicSlug}-${sub}`.toLowerCase().replace(/[^\w\d]+/g, '-');
-        await generateFullBookAction(`${topicSlug.toUpperCase()} Tomo ${sub}`, fileSlug, topicId, includeImages);
-      }
-
-      setStatus("Todos los libros han sido generados.");
+      setStatus("Subtemas generados. Puedes editar, eliminar o agregar nuevos.");
     } catch (err) {
       console.error(err);
-      setStatus("Error al generar los libros.");
+      setStatus("Error al generar los subtemas.");
     } finally {
-      setLoading(false);
+      setLoadingSubtopics(false);
+    }
+  };
+
+  const handleSubtopicChange = (index: number, newText: string) => {
+    const updatedResults = [...results];
+    updatedResults[index].subtopic = newText;
+    updatedResults[index].generated = false;
+    setResults(updatedResults);
+  };
+
+  const handleAddSubtopic = () => {
+    const newResult = {
+      subtopic: "",
+      url: "",
+      loading: false,
+      generated: false,
+    };
+    setResults([...results, newResult]);
+  };
+
+  const handleRemoveSubtopic = (index: number) => {
+    const updatedResults = results.filter((_, i) => i !== index);
+    setResults(updatedResults);
+  };
+
+  const handleGenerateBook = async (index: number) => {
+    if (!topicId || !topicSlug) return;
+
+    const updatedResults = [...results];
+    updatedResults[index].loading = true;
+    setResults([...updatedResults]);
+
+    const sub = results[index].subtopic;
+    const tomo = index + 1;
+    const fileSlug = `Tomo-${tomo}-${topicSlug}-${sub}`.toLowerCase().replace(/[^\w\d]+/g, '-');
+
+    try {
+      await generateFullBookAction(`${title.toUpperCase()} Tomo ${sub}`, fileSlug, topicId, includeImages);
+      updatedResults[index].generated = true;
+      updatedResults[index].url = `/generated/${topicId}/${fileSlug}.html`;
+      setStatus(`Tomo ${tomo} generado.`);
+    } catch (err) {
+      console.error(err);
+      setStatus(`Error al generar Tomo ${tomo}.`);
+    } finally {
+      updatedResults[index].loading = false;
+      setResults([...updatedResults]);
     }
   };
 
@@ -78,14 +128,22 @@ const FullBookGenerator = () => {
             }
             label="Generar con imágenes"
           />
-          <Button
-            variant="contained"
-            onClick={handleGenerate}
-            disabled={loading || !title.trim()}
-            className="mt-4"
-          >
-            {loading ? <CircularProgress size={24} /> : "Generar libros por subtema"}
-          </Button>
+          <Box className="flex gap-4 items-center mt-4">
+            <Button
+              variant="contained"
+              onClick={handleGenerateSubtopics}
+              disabled={loadingSubtopics || !title.trim()}
+            >
+              {loadingSubtopics ? <CircularProgress size={24} /> : "Generar subtemas"}
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={handleAddSubtopic}
+            >
+              Agregar subtema
+            </Button>
+          </Box>
           {status && <Typography className="mt-4">{status}</Typography>}
         </CardContent>
       </Card>
@@ -93,19 +151,42 @@ const FullBookGenerator = () => {
       {results.length > 0 && (
         <Card>
           <CardContent>
-            <Typography variant="h6" gutterBottom>Libros generados:</Typography>
+            <Typography variant="h6" gutterBottom>Subtemas:</Typography>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {results.map((item, index) => (
-                <div key={index} className="border p-4 rounded shadow-sm hover:shadow-md transition">
+                <div key={index} className="border p-4 rounded shadow-sm relative">
                   <Typography variant="subtitle2" gutterBottom color="textSecondary">
                     Tomo {index + 1}
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {item.subtopic}
-                  </Typography>
-                  <Link href={item.url} target="_blank" rel="noopener noreferrer" underline="hover">
-                    Ver libro
-                  </Link>
+                  <TextField
+                    fullWidth
+                    value={item.subtopic}
+                    onChange={(e) => handleSubtopicChange(index, e.target.value)}
+                    label="Subtema"
+                    className="mb-2"
+                  />
+                  <IconButton
+                    onClick={() => handleRemoveSubtopic(index)}
+                    className="absolute top-2 right-2"
+                    size="small"
+                    color="error"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  {item.generated ? (
+                    <Link href={item.url} target="_blank" rel="noopener noreferrer" underline="hover">
+                      Ver libro generado
+                    </Link>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      onClick={() => handleGenerateBook(index)}
+                      disabled={item.loading || !item.subtopic.trim()}
+                      className="mt-2"
+                    >
+                      {item.loading ? <CircularProgress size={20} /> : "Generar libro"}
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>

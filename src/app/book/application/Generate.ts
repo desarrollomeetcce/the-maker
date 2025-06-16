@@ -26,7 +26,7 @@ export async function generateTitleAction() {
 }
 
 export async function generateSubtopicsAction(title: string) {
-  const prompt = `Dado el título del libro: "${title}", sugiere entre 5 a 10 subtemas importantes que se podrían abordar en el libro. Solo devuelve una lista sencilla.`;
+  const prompt = `Dado el título del libro: "${title}", sugiere entre 10 o más subtemas importantes que se podrían abordar en el libro. Solo devuelve una lista sencilla.`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
@@ -48,7 +48,7 @@ export async function generateContentAction(subtopic: string, title: string) {
   const prompt = `
 Eres un generador de contenido para libros que se exportan como HTML. Escribe un capítulo largo (mínimo 800 palabras) para un libro titulado "${title}" con el subtema "${subtopic}".
 
-El texto debe estar en formato HTML válido, dividido en varios párrafos <p>. Cada 3 o 4 párrafos aproximadamente, incluye un marcador para imagen con esta estructura exacta:
+El texto debe estar en formato HTML válido, dividido en varios párrafos <p>. Cada 6 u 8 párrafos aproximadamente, incluye un marcador para imagen con esta estructura exacta:
 
 <div class="image-placeholder"></div>
 
@@ -77,19 +77,25 @@ Solo devuelve el contenido HTML, sin explicaciones ni comentarios adicionales.
 
 
 export async function generateCoverImageAction(title: string): Promise<string> {
-  const response = await openai.images.generate({
-    model: "dall-e-3",
-    prompt: `Una imagen del tamaño de una cuartilla que represente el concepto de "${title}",  sin bordes. Centrado en el tema, que sirva como portada de libro pero solo la imagen visual. Que tenga el titulo destacado ${title} en español`,
-    size: "1024x1024",
-    quality: "standard",
-    n: 1,
-  });
 
-  if (!response || !response.data || response.data.length === 0 || !response.data[0].url) {
-    throw new Error("No se pudo generar la imagen.");
+  try {
+    const response = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: `Una imagen del tamaño de una cuartilla que represente el concepto de "${title}",  sin bordes. Centrado en el tema, que sirva como portada de libro pero solo la imagen visual. Sin texto`,
+      size: "1024x1024",
+      quality: "standard",
+      n: 1,
+    });
+
+    if (!response || !response.data || response.data.length === 0 || !response.data[0].url) {
+      throw new Error("No se pudo generar la imagen.");
+    }
+
+    return response.data[0].url;
+  } catch (err) {
+    return ""
   }
 
-  return response.data[0].url;
 }
 
 export async function insertImagesIntoHTML(html: string, topic: string, subtopic: string): Promise<string> {
@@ -101,21 +107,26 @@ export async function insertImagesIntoHTML(html: string, topic: string, subtopic
   let updatedHTML = html;
 
   for (const match of matches) {
-    const imagePrompt = `Ilustración editorial para un libro sobre el subtema "${subtopic}" del tema general "${topic}". Sin texto, estilo profesional.`;
+    try {
+      const imagePrompt = `Ilustración editorial para un libro sobre el subtema "${subtopic}" del tema general "${topic}". Sin texto, estilo profesional.`;
 
-    const response = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: imagePrompt,
-      size: "1024x1024",
-      quality: "standard",
-      n: 1,
-    });
+      const response = await openai.images.generate({
+        model: "dall-e-3",
+        prompt: imagePrompt,
+        size: "1024x1024",
+        quality: "standard",
+        n: 1,
+      });
 
-    const imageUrl = response.data?.[0]?.url;
-    if (!imageUrl) continue;
+      const imageUrl = response.data?.[0]?.url;
+      if (!imageUrl) continue;
 
-    const imageTag = `<img src="${imageUrl}" alt="Imagen ilustrativa ${counter}" style="width:100%; margin: 2rem 0;" />`;
-    updatedHTML = updatedHTML.replace(match, imageTag);
+      const imageTag = `<img src="${imageUrl}" alt="Imagen ilustrativa ${counter}" style="width:100%; margin: 2rem 0;" />`;
+      updatedHTML = updatedHTML.replace(match, imageTag);
+    } catch (err) {
+      console.log(`No se pudo generar la imagen`)
+      console.log(err)
+    }
     counter++;
   }
 
@@ -200,14 +211,14 @@ export async function generateFullBookAction(
       }
 
       ${includeImages
-        && 
-        `.image-placeholder {
+    &&
+    `.image-placeholder {
         height: 300px;
         margin: 2rem 0;
         background-color: #eee;
         border: 1px dashed #aaa;
       }`
-      }
+    }
     
     </style>
   </head>
