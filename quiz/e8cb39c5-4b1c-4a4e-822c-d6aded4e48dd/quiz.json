@@ -1,0 +1,102 @@
+[
+  {
+    "question": "¿Cuál es el nombre dado a los insectos que se alimentan del tejido fresco de un cadáver en descomposición?",
+    "options": [
+      "Dípteros",
+      "Omnívoros",
+      "Xilófagos",
+      "Necrófagos"
+    ],
+    "answer": "Necrófagos"
+  },
+  {
+    "question": "¿Cuál es la etapa del ciclo de vida de los insectos cadavéricos en la que se produce la metamorfosis?",
+    "options": [
+      "Etapa de huevo",
+      "Etapa de larva",
+      "Etapa de pupa",
+      "Etapa de adulto"
+    ],
+    "answer": "Etapa de pupa"
+  },
+  {
+    "question": "¿Cuál es la importancia de los insectos en la estimación del tiempo de muerte en la entomología forense?",
+    "options": [
+      "Proporcionar una línea de tiempo subjetiva",
+      "Ayudar a analizar la temperatura ambiente",
+      "No son un factor determinante en la estimación del tiempo de muerte",
+      "Proporcionar una línea de tiempo objetiva e independiente de otros factores"
+    ],
+    "answer": "Proporcionar una línea de tiempo objetiva e independiente de otros factores"
+  },
+  {
+    "question": "¿Cuál de las siguientes especies de insectos es considerada como indicador clave del intervalo post mortem en la entomología forense?",
+    "options": [
+      "Mosca común (Musca domestica)",
+      "Escarabajo de la carroña (Dermestidae)",
+      "Hormigas necrófagas",
+      "Cucarachas"
+    ],
+    "answer": "Mosca común (Musca domestica)"
+  },
+  {
+    "question": "¿Cuál factor influye en la velocidad a la que los insectos llegan al cadáver y comienzan a alimentarse?",
+    "options": [
+      "Temperatura",
+      "Presencia de depredadores",
+      "Altura del cadáver",
+      "Etapa de descomposición"
+    ],
+    "answer": "Temperatura"
+  },
+  {
+    "question": "¿Cuál es uno de los métodos más comunes para recolectar insectos en una escena de crimen?",
+    "options": [
+      "Uso de trampas de luz UV",
+      "Muestreo directo del cadáver",
+      "Uso de pinzas y redes",
+      "Análisis en laboratorio"
+    ],
+    "answer": "Uso de trampas de luz UV"
+  },
+  {
+    "question": "¿Qué información crucial pueden proporcionar los insectos que colonizan un cadáver en un caso forense?",
+    "options": [
+      "Determinar la ubicación de la muerte",
+      "Establecer la causa de la muerte",
+      "Identificar el intervalo postmortem",
+      "Todas las anteriores"
+    ],
+    "answer": "Todas las anteriores"
+  },
+  {
+    "question": "¿Cuál es uno de los insectos más utilizados en entomología forense para estimar un intervalo postmortem corto?",
+    "options": [
+      "Mosca común",
+      "Escarabajos carroñeros",
+      "Avispas",
+      "Hormigas"
+    ],
+    "answer": "Mosca común"
+  },
+  {
+    "question": "¿Cuál es uno de los desafíos importantes en la entomología forense según el texto?",
+    "options": [
+      "Variabilidad de factores ambientales",
+      "Falta de estudios de referencia en ciertas regiones geográficas",
+      "Identificación precisa de especies de insectos",
+      "Presencia de sustancias químicas en el cadáver"
+    ],
+    "answer": "Falta de estudios de referencia en ciertas regiones geográficas"
+  },
+  {
+    "question": "¿Qué campo de investigación promete grandes avances en la entomología forense según el texto?",
+    "options": [
+      "Aplicación de la genética",
+      "Estudio de la microbiota",
+      "Desarrollo de nuevas técnicas de análisis químico",
+      "Integración de tecnologías de imagen avanzadas"
+    ],
+    "answer": "Aplicación de la genética"
+  }
+]

@@ -11,6 +11,7 @@ import fs from 'fs';
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY!;
 
 export async function generateTitleAction() {
   const prompt = `Genera un título creativo y llamativo para un libro que trate sobre desarrollo personal, tecnología o creatividad.`;
@@ -98,6 +99,93 @@ export async function generateCoverImageAction(title: string): Promise<string> {
 
 }
 
+export async function searchImageOnPixabay(query: string): Promise<string> {
+  const encodedQuery = encodeURIComponent(query);
+  const url = `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodedQuery}&image_type=photo&orientation=horizontal&safesearch=true&per_page=3`;
+
+  try {
+    const response = await fetch(url);
+    const data: any = await response.json();
+    if (data.hits && data.hits.length > 0) {
+      return data.hits[0].largeImageURL;
+    } else {
+      return 'https://via.placeholder.com/1024';
+    }
+  } catch (error) {
+    console.error('Error buscando imagen en Pixabay:', error);
+    return 'https://via.placeholder.com/1024';
+  }
+}
+
+export async function insertContextualImagesAndStore(
+  html: string,
+  topic: string,
+  bookId: string,
+  baseDir: string,
+  imageSource: 'dalle' | 'pixabay'
+): Promise<string> {
+  const placeholderRegex = /<div class="image-placeholder"><\/div>/g;
+  const matches = [...html.matchAll(placeholderRegex)];
+  if (matches.length === 0) return html;
+
+  let updatedHTML = html;
+  let offset = 0;
+
+  const imagesDir = path.join(baseDir, 'images');
+  await fs.promises.mkdir(imagesDir, { recursive: true });
+
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    const index = match.index!;
+
+    const before = updatedHTML.lastIndexOf('</p>', index);
+    const start = updatedHTML.lastIndexOf('<p>', before);
+    const contextText = updatedHTML.substring(start + 3, before).trim().slice(0, 200);
+
+    let imageUrl = '';
+    if (imageSource === 'pixabay') {
+      imageUrl = await searchImageOnPixabay(contextText);
+    } else {
+      const prompt = `Ilustración editorial realista para un libro sobre el tema "${topic}". La imagen debe representar: "${contextText}". Sin texto, estilo profesional.`;
+
+      const response = await openai.images.generate({
+        model: 'dall-e-3',
+        prompt,
+        size: '1024x1024',
+        quality: 'standard',
+        n: 1,
+      });
+
+      imageUrl = response.data?.[0]?.url || '';
+    }
+
+    if (!imageUrl) continue;
+
+    const imageRes = await fetch(imageUrl);
+    const arrayBuffer = await imageRes.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const imageFilename = `img-${bookId}-${topic.toLowerCase().replace(/[^\w\d]+/g, '-')}-${i + 1}.png`;
+    const imagePath = path.join(imagesDir, imageFilename);
+    const publicPath = `/generated/${bookId}/images/${imageFilename}`;
+
+    await writeFile(imagePath, buffer);
+
+    const imageTag = `<img src="${publicPath}" alt="Imagen ilustrativa ${i + 1}" style="width:100%; margin: 2rem 0;" />`;
+
+    const placeholderPos = match.index! + offset;
+    updatedHTML =
+      updatedHTML.slice(0, placeholderPos) +
+      imageTag +
+      updatedHTML.slice(placeholderPos + match[0].length);
+
+    offset += imageTag.length - match[0].length;
+  }
+
+  return updatedHTML;
+}
+
+
 export async function insertImagesIntoHTML(html: string, topic: string, subtopic: string): Promise<string> {
   const placeholderRegex = /<div class="image-placeholder"><\/div>/g;
   const matches = html.match(placeholderRegex);
@@ -139,7 +227,8 @@ export async function generateFullBookAction(
   title: string,
   filenameSlug: string,
   bookId: string,
-  includeImages: boolean
+  includeImages: boolean,
+  imageSource: 'dalle' | 'pixabay'
 ): Promise<{ success: boolean; bookId: string; indexUrl: string }> {
   const subtopics = await generateSubtopicsAction(title);
   const baseDir = path.resolve(process.cwd(), 'public', 'generated', bookId);
@@ -210,16 +299,13 @@ export async function generateFullBookAction(
         margin-bottom: 1.2rem;
       }
 
-      ${includeImages
-    &&
-    `.image-placeholder {
+      ${includeImages && `.image-placeholder {
         height: 300px;
         margin: 2rem 0;
         background-color: #eee;
         border: 1px dashed #aaa;
-      }`
-    }
-    
+      }`}
+
     </style>
   </head>
   <body>
@@ -228,9 +314,11 @@ export async function generateFullBookAction(
     <div class="cover-date">${date}</div>
 `;
 
-
-  console.log(`Generando tomo ${title}`);
-  console.log(subtopics);
+  let quizQuestions: {
+    question: string;
+    options: string[];
+    answer: string;
+  }[] = [];
 
   for (let i = 0; i < subtopics.length; i++) {
     const subtopic = subtopics[i];
@@ -241,23 +329,31 @@ export async function generateFullBookAction(
         <h2>${subtopic}</h2>
         ${rawHtml}
       `;
+
+      const question = await generateQuestionFromHtml(rawHtml, subtopic, title);
+      if (question) quizQuestions.push(question);
     } catch (e) {
       console.error(`Error generando el subtema: ${subtopic}`, e);
       fullHTML += `<p style="color:red;">Error generando el subtema: ${subtopic}</p>`;
     }
   }
 
-  fullHTML += `
-    </body>
-    </html>
-  `;
-
+  fullHTML += `</body></html>`;
   await writeFile(fullPath, fullHTML, 'utf8');
 
   if (includeImages) {
-    const htmlWithImages = await insertContextualImagesAndStore(fullHTML, title, bookId, baseDir);
+    const htmlWithImages = await insertContextualImagesAndStore(fullHTML, title, bookId, baseDir,imageSource);
     await writeFile(fullPath, htmlWithImages, 'utf8');
   }
+
+  const baseQuizDir = path.resolve(process.cwd(), 'quiz', bookId);
+
+  await mkdir(baseQuizDir, { recursive: true });
+  await writeFile(
+    path.join(baseQuizDir, 'quiz.json'),
+    JSON.stringify(quizQuestions, null, 2),
+    'utf8'
+  );
 
   return {
     success: true,
@@ -265,6 +361,44 @@ export async function generateFullBookAction(
     indexUrl: publicPath,
   };
 }
+
+export async function generateQuestionFromHtml(html: string, subtopic: string, title: string) {
+  const plainText = html.replace(/<[^>]*>/g, '').slice(0, 2000);
+
+  const prompt = `
+Del siguiente texto, crea UNA sola pregunta de opción múltiple para un cuestionario. 
+La pregunta debe estar relacionada con el subtema "${subtopic}" del libro "${title}".
+
+Devuelve solo un objeto JSON con esta forma:
+{
+  "question": "Texto de la pregunta...",
+  "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+  "answer": "Opción correcta"
+}
+
+Texto del capítulo:
+"${plainText}"
+`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    });
+
+    const text = response.choices[0]?.message?.content || '';
+    const jsonStart = text.indexOf('{');
+    const jsonEnd = text.lastIndexOf('}');
+    const json = text.slice(jsonStart, jsonEnd + 1);
+
+    return JSON.parse(json);
+  } catch (err) {
+    console.error(`Error generando pregunta para el subtema "${subtopic}"`, err);
+    return null;
+  }
+}
+
 
 import { default as fetch } from 'node-fetch';
 
@@ -285,66 +419,42 @@ export async function downloadImageToLocal(url: string, bookId: string, tomoSlug
 }
 
 
-export async function insertContextualImagesAndStore(
-  html: string,
-  topic: string,
-  bookId: string,
-  baseDir: string
-): Promise<string> {
-  const placeholderRegex = /<div class="image-placeholder"><\/div>/g;
-  const matches = [...html.matchAll(placeholderRegex)];
-  if (matches.length === 0) return html;
 
-  let updatedHTML = html;
-  let offset = 0;
 
-  const imagesDir = path.join(baseDir, 'images');
-  await fs.promises.mkdir(imagesDir, { recursive: true });
+export async function generateQuizFromHtml(html: string, subtopic: string, title: string) {
+  const plainText = html.replace(/<[^>]*>/g, '').slice(0, 4000); // GPT-3.5 input limit y limpieza
 
-  for (let i = 0; i < matches.length; i++) {
-    const match = matches[i];
-    const index = match.index!;
+  const prompt = `
+A partir del siguiente texto de un capítulo de un libro titulado "${title}" con el subtema "${subtopic}", crea un cuestionario de 10 preguntas. 
 
-    // Extraer el párrafo antes del placeholder como contexto
-    const before = updatedHTML.lastIndexOf('</p>', index);
-    const start = updatedHTML.lastIndexOf('<p>', before);
-    const contextText = updatedHTML.substring(start + 3, before).trim().slice(0, 200);
+El formato de salida debe ser JSON con el siguiente esquema:
+[
+  {
+    "question": "¿Pregunta 1...?",
+    "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+    "answer": "Opción correcta"
+  },
+  ...
+]
 
-    const prompt = `Ilustración editorial realista para un libro sobre el tema "${topic}". La imagen debe representar: "${contextText}". Sin texto, estilo profesional.`;
+Texto del capítulo:
+"${plainText}"
+`;
 
-    const response = await openai.images.generate({
-      model: "dall-e-3",
-      prompt,
-      size: "1024x1024",
-      quality: "standard",
-      n: 1,
-    });
+  const response = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.7,
+  });
 
-    const imageUrl = response.data?.[0]?.url;
-    if (!imageUrl) continue;
-
-    // Descargar imagen y guardarla en disco
-    const imageRes = await fetch(imageUrl);
-    const arrayBuffer = await imageRes.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const imageFilename = `img-${bookId}-${topic.toLowerCase().replace(/[^\w\d]+/g, '-')}-${i + 1}.png`;
-    const imagePath = path.join(imagesDir, imageFilename);
-    const publicPath = `/generated/${bookId}/images/${imageFilename}`;
-
-    await writeFile(imagePath, buffer);
-
-    const imageTag = `<img src="${publicPath}" alt="Imagen ilustrativa ${i + 1}" style="width:100%; margin: 2rem 0;" />`;
-
-    const placeholderPos = match.index! + offset;
-    updatedHTML =
-      updatedHTML.slice(0, placeholderPos) +
-      imageTag +
-      updatedHTML.slice(placeholderPos + match[0].length);
-
-    offset += imageTag.length - match[0].length;
+  try {
+    const text = response.choices[0]?.message?.content || '';
+    const jsonStart = text.indexOf('[');
+    const jsonEnd = text.lastIndexOf(']');
+    const json = text.slice(jsonStart, jsonEnd + 1);
+    return JSON.parse(json);
+  } catch (err) {
+    console.error("Error al parsear cuestionario", err);
+    return [];
   }
-
-  return updatedHTML;
 }
-

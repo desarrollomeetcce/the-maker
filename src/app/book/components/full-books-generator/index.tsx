@@ -12,6 +12,7 @@ const FullBookGenerator = () => {
   const [loadingSubtopics, setLoadingSubtopics] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [includeImages, setIncludeImages] = useState(false);
+  const [generateImges, setGenerateImages] = useState(true);
   const [topicId, setTopicId] = useState<string | null>(null);
   const [topicSlug, setTopicSlug] = useState<string | null>(null);
   const [results, setResults] = useState<{
@@ -19,6 +20,7 @@ const FullBookGenerator = () => {
     url: string;
     loading: boolean;
     generated: boolean;
+    newTopicId: string;
   }[]>([]);
 
   const handleGenerateSubtopics = async () => {
@@ -43,7 +45,7 @@ const FullBookGenerator = () => {
         const tomo = i + 1;
         const fileSlug = `Tomo-${tomo}-${newTopicSlug}-${sub}`.toLowerCase().replace(/[^\w\d]+/g, '-');
         const url = `/generated/${newTopicId}/${fileSlug}.html`;
-        return { subtopic: sub, url, loading: false, generated: false };
+        return { subtopic: sub, url, loading: false, generated: false, newTopicId };
       });
 
       setResults(resultArray);
@@ -69,6 +71,7 @@ const FullBookGenerator = () => {
       url: "",
       loading: false,
       generated: false,
+      newTopicId: ""
     };
     setResults([...results, newResult]);
   };
@@ -90,7 +93,7 @@ const FullBookGenerator = () => {
     const fileSlug = `Tomo-${tomo}-${topicSlug}-${sub}`.toLowerCase().replace(/[^\w\d]+/g, '-');
 
     try {
-      await generateFullBookAction(`${title.toUpperCase()} Tomo ${sub}`, fileSlug, topicId, includeImages);
+      await generateFullBookAction(`${title.toUpperCase()} Tomo ${sub}`, fileSlug, topicId, includeImages, generateImges ? "dalle" : "pixabay");
       updatedResults[index].generated = true;
       updatedResults[index].url = `/generated/${topicId}/${fileSlug}.html`;
       setStatus(`Tomo ${tomo} generado.`);
@@ -127,6 +130,15 @@ const FullBookGenerator = () => {
               />
             }
             label="Generar con imágenes"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={!generateImges}
+                onChange={(e) => setGenerateImages(!e.target.checked)}
+              />
+            }
+            label="Buscar imagenes en la web"
           />
           <Box className="flex gap-4 items-center mt-4">
             <Button
@@ -165,28 +177,52 @@ const FullBookGenerator = () => {
                     label="Subtema"
                     className="mb-2"
                   />
-                  <IconButton
-                    onClick={() => handleRemoveSubtopic(index)}
-                    className="absolute top-2 right-2"
-                    size="small"
-                    color="error"
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                  {item.generated ? (
-                    <Link href={item.url} target="_blank" rel="noopener noreferrer" underline="hover">
-                      Ver libro generado
-                    </Link>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      onClick={() => handleGenerateBook(index)}
-                      disabled={item.loading || !item.subtopic.trim()}
-                      className="mt-2"
+                  <div className="relative">
+                    <IconButton
+                      onClick={() => handleRemoveSubtopic(index)}
+                      className="absolute top-2 right-2"
+                      size="small"
+                      color="error"
                     >
-                      {item.loading ? <CircularProgress size={20} /> : "Generar libro"}
-                    </Button>
-                  )}
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+
+                    {item.generated ? (
+                      <div className="flex flex-col gap-2 mt-2">
+                        <Link
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          underline="hover"
+                        >
+                          <Button variant="outlined" fullWidth>
+                            Ver libro generado
+                          </Button>
+                        </Link>
+                        <Link
+                          href={`/book/${topicId}`} // <-- corregido: debe usar topicId
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          underline="hover"
+                        >
+                          <Button variant="outlined" fullWidth>
+                            Ver cuestionario
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        onClick={() => handleGenerateBook(index)}
+                        disabled={item.loading || !item.subtopic.trim()}
+                        className="mt-2"
+                        fullWidth
+                      >
+                        {item.loading ? <CircularProgress size={20} /> : "Generar libro"}
+                      </Button>
+                    )}
+                  </div>
+
                 </div>
               ))}
             </div>

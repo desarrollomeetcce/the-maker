@@ -1,0 +1,102 @@
+[
+  {
+    "question": "¿Cuál es el segundo estadio de descomposición post mortem descrito en el texto?",
+    "options": [
+      "Livideces cadavéricas",
+      "Rigidez cadavérica",
+      "Algor mortis",
+      "Descomposición celular"
+    ],
+    "answer": "Rigidez cadavérica"
+  },
+  {
+    "question": "¿Cuál es uno de los factores ambientales que influyen en la descomposición post mortem según el texto?",
+    "options": [
+      "La presencia de insectos",
+      "La causa de la muerte",
+      "La temperatura ambiente",
+      "La presencia de oxígeno"
+    ],
+    "answer": "La temperatura ambiente"
+  },
+  {
+    "question": "¿Cuál es el nombre del proceso en el que el cuerpo pierde calor gradualmente después de la muerte?",
+    "options": [
+      "Algor mortis",
+      "Rigor mortis",
+      "Livor mortis",
+      "Rigor caloris"
+    ],
+    "answer": "Algor mortis"
+  },
+  {
+    "question": "¿Qué fenómeno cadavérico se caracteriza por la acumulación de sangre desoxigenada en los vasos sanguíneos de la parte inferior del cuerpo, creando un efecto de gravedad que favorece su distribución?",
+    "options": [
+      "Palidez cadavérica",
+      "Livideces",
+      "Putrefacción verde",
+      "Putrefacción negra"
+    ],
+    "answer": "Livideces"
+  },
+  {
+    "question": "¿Qué gas es el más comúnmente producido durante la descomposición post mortem?",
+    "options": [
+      "Metano",
+      "Sulfuro de hidrógeno",
+      "Dióxido de carbono",
+      "Oxígeno"
+    ],
+    "answer": "Metano"
+  },
+  {
+    "question": "¿Cuál es el papel de las aves rapaces en el proceso de descomposición post mortem?",
+    "options": [
+      "Consumir tejidos blandos del cadáver",
+      "Alimentarse de insectos carroñeros",
+      "Contribuir a la eliminación de los tejidos en descomposición",
+      "Proteger el cadáver de otros animales"
+    ],
+    "answer": "Contribuir a la eliminación de los tejidos en descomposición"
+  },
+  {
+    "question": "¿Cuál es uno de los factores clave en el proceso de momificación?",
+    "options": [
+      "La humedad del entorno",
+      "La presencia de microorganismos",
+      "La temperatura ambiente",
+      "La exposición al aire"
+    ],
+    "answer": "La temperatura ambiente"
+  },
+  {
+    "question": "¿Qué tipo de microorganismos son los principales responsables de la descomposición de los tejidos durante la putrefacción?",
+    "options": [
+      "Bacterias aerobias",
+      "Bacterias anaerobias",
+      "Hongos",
+      "Virus"
+    ],
+    "answer": "Bacterias anaerobias"
+  },
+  {
+    "question": "¿Qué factor puede acelerar el proceso de descomposición de un cadáver en ambientes acuáticos?",
+    "options": [
+      "La falta de oxígeno en el agua",
+      "La presencia de peces u otros animales acuáticos",
+      "La salinidad del agua",
+      "La temperatura del agua"
+    ],
+    "answer": "La presencia de peces u otros animales acuáticos"
+  },
+  {
+    "question": "¿Cuál de las siguientes técnicas se utiliza para estimar el tiempo de muerte mediante la medición de la temperatura corporal del cadáver?",
+    "options": [
+      "Enfriamiento post mortem",
+      "Rigor mortis",
+      "Descomposición de los tejidos corporales",
+      "Análisis de la concentración de ciertas sustancias"
+    ],
+    "answer": "Enfriamiento post mortem"
+  }
+]
