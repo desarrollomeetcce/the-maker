@@ -1,13 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TextField, Button, Typography, Card, CardContent, CircularProgress, Link, Box, FormControlLabel, Checkbox, IconButton } from "@mui/material";
 import { v4 as uuidv4 } from 'uuid';
 import { generateSubtopicsAction, generateFullBookAction } from "../../application/Generate";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { upsertSubtopic, removeSubtopicByTitle, saveTopicWithSubtopics } from "../../application/ManageTopics";
+import debounce from "lodash.debounce";
 
 const FullBookGenerator = () => {
+  const debouncedUpdate = useRef(
+  debounce(async (index: number, title: string) => {
+    try {
+      if (topicId && title.trim()) {
+        await upsertSubtopic(topicId, title); // ya conoces la ruta y paths internamente
+      }
+    } catch (error) {
+      console.error("Error actualizando subtema:", error);
+    }
+  }, 600)
+).current;
+
+
   const [title, setTitle] = useState("");
   const [loadingSubtopics, setLoadingSubtopics] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -38,6 +53,10 @@ const FullBookGenerator = () => {
       const newTopicId = uuidv4();
       const newTopicSlug = title.toLowerCase().replace(/[^\w\d]+/g, '-');
 
+      // 🔹 Guarda el topic y subtemas en la base de datos
+      await saveTopicWithSubtopics(newTopicId, title, newTopicSlug, subtopics);
+
+
       setTopicId(newTopicId);
       setTopicSlug(newTopicSlug);
 
@@ -49,6 +68,7 @@ const FullBookGenerator = () => {
       });
 
       setResults(resultArray);
+
       setStatus("Subtemas generados. Puedes editar, eliminar o agregar nuevos.");
     } catch (err) {
       console.error(err);
@@ -63,9 +83,11 @@ const FullBookGenerator = () => {
     updatedResults[index].subtopic = newText;
     updatedResults[index].generated = false;
     setResults(updatedResults);
+    debouncedUpdate(index, newText);
   };
 
-  const handleAddSubtopic = () => {
+  const handleAddSubtopic = async () => {
+    if (!topicId) return;
     const newResult = {
       subtopic: "",
       url: "",
@@ -73,10 +95,17 @@ const FullBookGenerator = () => {
       generated: false,
       newTopicId: ""
     };
+    const response = await upsertSubtopic(topicId, "");
     setResults([...results, newResult]);
   };
 
-  const handleRemoveSubtopic = (index: number) => {
+  const handleRemoveSubtopic = async (index: number) => {
+    if (!topicId) return;
+    const sub = results[index];
+    if (sub.subtopic) {
+      await removeSubtopicByTitle(topicId, sub.subtopic);
+
+    }
     const updatedResults = results.filter((_, i) => i !== index);
     setResults(updatedResults);
   };

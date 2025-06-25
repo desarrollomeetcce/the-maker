@@ -1,0 +1,102 @@
+[
+  {
+    "question": "¿Cuánto tiempo aproximadamente tarda la rigidez cadavérica en alcanzar su punto máximo después de la muerte?",
+    "options": [
+      "2 a 6 horas",
+      "6 a 12 horas",
+      "12 a 24 horas",
+      "24 a 48 horas"
+    ],
+    "answer": "12 a 24 horas"
+  },
+  {
+    "question": "¿Qué factor influye en la rigidez cadavérica según la temperatura ambiente?",
+    "options": [
+      "La actividad muscular previa a la muerte",
+      "La edad y el estado de salud del individuo",
+      "La posición en la que se encuentra el cadáver",
+      "La temperatura ambiente"
+    ],
+    "answer": "La temperatura ambiente"
+  },
+  {
+    "question": "¿Cuándo suele alcanzar la rigidez cadavérica su máximo nivel después del fallecimiento?",
+    "options": [
+      "A) Entre 2 y 4 horas postmortem",
+      "B) Entre 12 y 24 horas postmortem",
+      "C) A partir de las 36 horas postmortem",
+      "D) Entre 48 y 72 horas postmortem"
+    ],
+    "answer": "B) Entre 12 y 24 horas postmortem"
+  },
+  {
+    "question": "¿Cuál es la importancia forense de la rigidez cadavérica en la resolución de casos criminales?",
+    "options": [
+      "Para determinar la causa de la muerte",
+      "Para establecer la hora exacta de la defunción",
+      "Para identificar si hubo negligencia o abuso involucrado",
+      "Para determinar si se ha producido manipulación del cuerpo después de la muerte"
+    ],
+    "answer": "Para identificar si hubo negligencia o abuso involucrado"
+  },
+  {
+    "question": "¿Cuál es una diferencia importante entre la rigidez cadavérica y la lividez cadavérica?",
+    "options": [
+      "La rigidez cadavérica afecta la musculatura del cuerpo, mientras que la lividez cadavérica afecta la piel.",
+      "La rigidez cadavérica es irreversible, mientras que la lividez cadavérica es reversible.",
+      "La rigidez cadavérica ocurre aproximadamente de 2 a 4 horas después de la muerte, mientras que la lividez cadavérica ocurre alrededor de 12 horas después de la muerte.",
+      "La rigidez cadavérica es un proceso de descomposición celular, mientras que la lividez cadavérica es una contracción de los músculos."
+    ],
+    "answer": "La rigidez cadavérica afecta la musculatura del cuerpo, mientras que la lividez cadavérica afecta la piel."
+  },
+  {
+    "question": "¿Cuál es uno de los métodos más objetivos y cuantitativos para medir la rigidez cadavérica?",
+    "options": [
+      "Método de la palpación",
+      "Método de la flexión de las articulaciones",
+      "Uso de un dinamómetro",
+      "Electromiografía"
+    ],
+    "answer": "Uso de un dinamómetro"
+  },
+  {
+    "question": "¿Qué factor influyó en la rigidez cadavérica en el caso de John Doe?",
+    "options": [
+      "La posición del cuerpo al momento de la muerte",
+      "La temperatura ambiente",
+      "La presencia de agua en el entorno",
+      "La hora del día en que fue encontrado"
+    ],
+    "answer": "La posición del cuerpo al momento de la muerte"
+  },
+  {
+    "question": "¿Qué factor ambiental puede acelerar la aparición de la rigidez cadavérica?",
+    "options": [
+      "Temperatura fría",
+      "Humedad alta",
+      "Exposición al aire",
+      "Presión atmosférica"
+    ],
+    "answer": "Exposición al aire"
+  },
+  {
+    "question": "¿En qué casos la rigidez cadavérica tiende a manifestarse de manera más intensa en la zona del cuello y la cara?",
+    "options": [
+      "En casos de muerte por envenenamiento",
+      "En casos de muerte súbita por causas cardíacas",
+      "En casos de muerte por asfixia",
+      "En casos de muerte por traumatismos craneoencefálicos"
+    ],
+    "answer": "En casos de muerte por asfixia"
+  },
+  {
+    "question": "¿Qué factor puede influir en la velocidad de aparición de la rigidez cadavérica?",
+    "options": [
+      "La temperatura ambiente",
+      "El grupo sanguíneo",
+      "El tipo de dieta",
+      "El horario de la muerte"
+    ],
+    "answer": "La temperatura ambiente"
+  }
+]

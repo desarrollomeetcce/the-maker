@@ -1,0 +1,102 @@
+[
+  {
+    "question": "¿Cuál es el intervalo de tiempo aproximado en el que la rigidez cadavérica alcanza su máximo nivel después de la muerte?",
+    "options": [
+      "2 a 4 horas",
+      "6 a 8 horas",
+      "12 a 24 horas",
+      "24 a 48 horas"
+    ],
+    "answer": "12 a 24 horas"
+  },
+  {
+    "question": "¿Cuál es el período de tiempo en el que las livideces cadavéricas alcanzan su máxima intensidad después de la muerte?",
+    "options": [
+      "De 2 a 4 horas",
+      "Entre 6 y 12 horas",
+      "De 12 a 24 horas",
+      "Más de 24 horas"
+    ],
+    "answer": "Entre 6 y 12 horas"
+  },
+  {
+    "question": "¿Cuál es uno de los primeros signos visibles de la putrefacción según el texto?",
+    "options": [
+      "Cambio de temperatura corporal",
+      "Sangrado por los oídos",
+      "Cambio de coloración de la piel",
+      "Aumento del ritmo cardíaco"
+    ],
+    "answer": "Cambio de coloración de la piel"
+  },
+  {
+    "question": "¿Qué son los 'sucos cadavéricos'?",
+    "options": [
+      "Son nutrientes liberados por las células del cuerpo durante la autólisis.",
+      "Son enzimas proteolíticas liberadas por las células del propio organismo.",
+      "Son líquidos corporales descompuestos que se filtran a través de los tejidos descompuestos.",
+      "Son áreas de aspecto gelatinoso formadas durante la autólisis."
+    ],
+    "answer": "Son líquidos corporales descompuestos que se filtran a través de los tejidos descompuestos."
+  },
+  {
+    "question": "¿Qué factor es clave en el proceso de momificación?",
+    "options": [
+      "Presencia de microorganismos",
+      "Exposición a condiciones secas",
+      "Temperaturas extremadamente altas",
+      "Enterramiento en agua"
+    ],
+    "answer": "Exposición a condiciones secas"
+  },
+  {
+    "question": "¿Qué factores pueden influir en la formación de adipocira en un cuerpo?",
+    "options": [
+      "La temperatura ambiente y la humedad",
+      "La presencia de microorganismos y la composición química del suelo",
+      "La falta de oxígeno y la presencia de sales minerales",
+      "Todas las anteriores"
+    ],
+    "answer": "Todas las anteriores"
+  },
+  {
+    "question": "¿Qué condiciones son clave para que se produzca la saponificación de un cadáver?",
+    "options": [
+      "Presencia de oxígeno y ausencia de agua",
+      "Presencia de agua y ausencia de oxígeno",
+      "Enterrado en suelos secos y alcalinos",
+      "Presencia de bacterias aeróbicas"
+    ],
+    "answer": "Presencia de agua y ausencia de oxígeno"
+  },
+  {
+    "question": "¿Qué gases se acumulan en el cuerpo durante el enfisema cadavérico?",
+    "options": [
+      "Dióxido de carbono, oxígeno, nitrógeno",
+      "Dióxido de carbono, metano, sulfuro de hidrógeno",
+      "Oxígeno, helio, argón",
+      "Metano, hidrógeno, nitrógeno"
+    ],
+    "answer": "Dióxido de carbono, metano, sulfuro de hidrógeno"
+  },
+  {
+    "question": "¿Qué fenómeno se produce en la descomposición acuática cuando los ácidos grasos del tejido adiposo se combinan con minerales presentes en el agua?",
+    "options": [
+      "Adipocira",
+      "Insectos acuáticos",
+      "Separación de tejidos blandos",
+      "Corrientes y profundidad del agua"
+    ],
+    "answer": "Adipocira"
+  },
+  {
+    "question": "¿Qué fenómeno se produce debido a la acumulación de sangre en las partes inferiores del cuerpo durante la descomposición en el aire?",
+    "options": [
+      "Meteorismo cadavérico",
+      "Livideces",
+      "Putrefacción",
+      "Liquenificación"
+    ],
+    "answer": "Livideces"
+  }
+]

@@ -228,7 +228,7 @@ export async function generateFullBookAction(
   filenameSlug: string,
   bookId: string,
   includeImages: boolean,
-  imageSource: 'dalle' | 'pixabay'
+  imageSource: 'dalle' | 'pixabay',
 ): Promise<{ success: boolean; bookId: string; indexUrl: string }> {
   const subtopics = await generateSubtopicsAction(title);
   const baseDir = path.resolve(process.cwd(), 'public', 'generated', bookId);
@@ -247,6 +247,7 @@ export async function generateFullBookAction(
 
   const coverImageUrl = await generateCoverImageAction(title);
   const localCoverPath = await downloadImageToLocal(coverImageUrl, bookId, filenameSlug);
+
 
   let fullHTML = `
   <html>
@@ -323,6 +324,7 @@ export async function generateFullBookAction(
   for (let i = 0; i < subtopics.length; i++) {
     const subtopic = subtopics[i];
 
+
     try {
       const rawHtml = await generateContentAction(subtopic, title);
       fullHTML += `
@@ -332,6 +334,9 @@ export async function generateFullBookAction(
 
       const question = await generateQuestionFromHtml(rawHtml, subtopic, title);
       if (question) quizQuestions.push(question);
+
+
+
     } catch (e) {
       console.error(`Error generando el subtema: ${subtopic}`, e);
       fullHTML += `<p style="color:red;">Error generando el subtema: ${subtopic}</p>`;
@@ -342,25 +347,38 @@ export async function generateFullBookAction(
   await writeFile(fullPath, fullHTML, 'utf8');
 
   if (includeImages) {
-    const htmlWithImages = await insertContextualImagesAndStore(fullHTML, title, bookId, baseDir,imageSource);
+    const htmlWithImages = await insertContextualImagesAndStore(fullHTML, title, bookId, baseDir, imageSource);
     await writeFile(fullPath, htmlWithImages, 'utf8');
   }
 
   const baseQuizDir = path.resolve(process.cwd(), 'quiz', bookId);
-
   await mkdir(baseQuizDir, { recursive: true });
   await writeFile(
     path.join(baseQuizDir, 'quiz.json'),
     JSON.stringify(quizQuestions, null, 2),
     'utf8'
   );
-
+  try {
+    console.log(filenameSlug)
+    await prisma.subtopic.updateMany({
+      where: {
+        topicId: bookId,
+        slug:filenameSlug,
+      },
+      data: {
+        generated: true,
+      },
+    });
+  } catch (err) {
+    console.log(err)
+  }
   return {
     success: true,
     bookId,
     indexUrl: publicPath,
   };
 }
+
 
 export async function generateQuestionFromHtml(html: string, subtopic: string, title: string) {
   const plainText = html.replace(/<[^>]*>/g, '').slice(0, 2000);
@@ -401,6 +419,8 @@ Texto del capítulo:
 
 
 import { default as fetch } from 'node-fetch';
+import { prisma } from '@/lib/prisma';
+import { getAuthUserId } from '@/lib/auth';
 
 export async function downloadImageToLocal(url: string, bookId: string, tomoSlug: string): Promise<string> {
   const imageDir = path.resolve(process.cwd(), 'public', 'generated', bookId, 'images');
@@ -456,5 +476,70 @@ Texto del capítulo:
   } catch (err) {
     console.error("Error al parsear cuestionario", err);
     return [];
+  }
+}
+
+
+
+export async function regenerateSubtopicAction(subtopicId: string) {
+  const subtopic = await prisma.subtopic.findUnique({
+    where: { id: subtopicId },
+    include: { topic: true },
+  });
+
+  if (!subtopic || !subtopic.topic) {
+    throw new Error("Subtema no encontrado.");
+  }
+
+  const { title: subtopicTitle, topic } = subtopic;
+  const bookId = topic.id;
+  const topicTitle = topic.title;
+  const topicSlug = topic.slug;
+
+  const fileSlug = `Tomo-${subtopicTitle}-${topicSlug}`.toLowerCase().replace(/[^\w\d]+/g, '-');
+  const htmlFilename = `${fileSlug}.html`;
+  const quizFilename = `quiz-${fileSlug}.json`;
+
+  const htmlDir = path.resolve(process.cwd(), 'public', 'generated', bookId);
+  const quizDir = path.resolve(process.cwd(), 'quiz', bookId);
+
+  await mkdir(htmlDir, { recursive: true });
+  await mkdir(quizDir, { recursive: true });
+
+  try {
+    let html = await generateContentAction(subtopicTitle, topicTitle);
+    html = await insertContextualImagesAndStore(html, topicTitle, bookId, htmlDir, "dalle");
+
+    const fullHtml = `
+    <html>
+      <head><meta charset="UTF-8" /></head>
+      <body>
+        <h2>${subtopicTitle}</h2>
+        ${html}
+      </body>
+    </html>
+    `;
+
+    const htmlPath = path.join(htmlDir, htmlFilename);
+    await writeFile(htmlPath, fullHtml, 'utf8');
+
+    const question = await generateQuestionFromHtml(html, subtopicTitle, topicTitle);
+    const quizJson = question ? [question] : [];
+    const quizPath = path.join(quizDir, quizFilename);
+    await writeFile(quizPath, JSON.stringify(quizJson, null, 2), 'utf8');
+
+    await prisma.subtopic.update({
+      where: { id: subtopicId },
+      data: {
+        generated: true,
+        htmlPath: `/generated/${bookId}/${htmlFilename}`,
+        quizPath: `/quiz/${bookId}/${quizFilename}`,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error regenerando subtema:", error);
+    return { success: false };
   }
 }

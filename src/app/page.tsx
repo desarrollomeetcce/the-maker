@@ -1,7 +1,7 @@
-import FullBookGenerator from "./book/components/full-books-generator";
+import LoginView from "./login/components/login-view";
 
 export default function Home() {
   return (
-    <FullBookGenerator />
+    <LoginView />
   );
 }

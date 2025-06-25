@@ -1,0 +1,112 @@
+[
+  {
+    "question": "¿Cuál es una de las estructuras de control condicionales más comunes en programación?",
+    "options": [
+      "if",
+      "for",
+      "switch",
+      "while"
+    ],
+    "answer": "if"
+  },
+  {
+    "question": "¿Cuál es la principal diferencia entre el bucle while y el bucle do-while?",
+    "options": [
+      "El bucle while no ejecuta el bloque de código si la condición es falsa, mientras que el bucle do-while siempre ejecuta al menos una vez el bloque de código antes de evaluar la condición.",
+      "El bucle while siempre ejecuta al menos una vez el bloque de código antes de evaluar la condición, mientras que el bucle do-while no ejecuta el bloque de código si la condición es falsa.",
+      "El bucle while no tiene una condición de salida, mientras que el bucle do-while sí tiene una condición de salida.",
+      "El bucle while y el bucle do-while son exactamente iguales en su funcionamiento."
+    ],
+    "answer": "El bucle while no ejecuta el bloque de código si la condición es falsa, mientras que el bucle do-while siempre ejecuta al menos una vez el bloque de código antes de evaluar la condición."
+  },
+  {
+    "question": "¿Qué palabra clave se utiliza para devolver un valor al final de la ejecución de una función?",
+    "options": [
+      "break",
+      "return",
+      "continue",
+      "yield"
+    ],
+    "answer": "return"
+  },
+  {
+    "question": "¿Cuál es la función matemática que se utiliza como ejemplo clásico de recursividad en programación?",
+    "options": [
+      "Sumatoria",
+      "Multiplicación",
+      "Exponenciación",
+      "Factorial"
+    ],
+    "answer": "Factorial"
+  },
+  {
+    "question": "¿Cuál es la función de la sentencia 'break' en un switch?",
+    "options": [
+      "Detener la ejecución del switch y salir de la estructura",
+      "Continuar con la evaluación del siguiente caso",
+      "Saltar al caso 'default'",
+      "Reiniciar la evaluación de la expresión"
+    ],
+    "answer": "Detener la ejecución del switch y salir de la estructura"
+  },
+  {
+    "question": "¿Cuál es una característica importante del 'case' en programación?",
+    "options": [
+      "Permite evaluar una expresión y ejecutar diferentes bloques de código",
+      "Es conocido como 'switch' en muchos lenguajes de programación",
+      "Debe finalizar con la instrucción 'break' en cada caso",
+      "Permite agrupar varios casos que ejecuten el mismo bloque de código"
+    ],
+    "answer": "Debe finalizar con la instrucción 'break' en cada caso"
+  },
+  {
+    "question": "¿Qué bloque se ejecuta si no se ha producido ninguna excepción en un bloque try en Python?",
+    "options": [
+      "Bloque except",
+      "Bloque else",
+      "Bloque finally",
+      "Bloque try"
+    ],
+    "answer": "Bloque else"
+  },
+  {
+    "question": "¿Cuál es uno de los usos más comunes de los ciclos anidados en programación de juegos?",
+    "options": [
+      "Generar tablas de multiplicación",
+      "Recorrer matrices bidimensionales",
+      "Aplicar filtros a imágenes",
+      "Realizar operaciones complejas"
+    ],
+    "answer": "Recorrer matrices bidimensionales"
+  },
+  {
+    "question": "¿Qué tipo de iterador nos permite recorrer una colección de elementos un número determinado de veces?",
+    "options": [
+      "Bucle while",
+      "Bucle foreach",
+      "Bucle for",
+      "Iterador avanzado"
+    ],
+    "answer": "Bucle for"
+  },
+  {
+    "question": "¿Qué operador lógico se utiliza para combinar dos condiciones y devuelve verdadero si al menos una de las condiciones es verdadera?",
+    "options": [
+      "AND",
+      "OR",
+      "NOT",
+      "XOR"
+    ],
+    "answer": "OR"
+  },
+  {
+    "question": "¿Qué operación implica dividir una cadena en subcadenas más pequeñas basadas en un delimitador específico?",
+    "options": [
+      "Concatenación",
+      "División",
+      "Búsqueda",
+      "Reemplazo"
+    ],
+    "answer": "División"
+  }
+]

@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  name              String?
+  passwordHash      String
+  approved          Boolean  @default(false)
+  maxBooks          Int      @default(5)
+  canGenerateImages Boolean  @default(false)
+  topics            Topic[]
+  createdAt         DateTime @default(now())
+  admin             Admin?
+}
+
+model Topic {
+  id        String     @id @default(cuid())
+  title     String
+  slug      String
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  subtopics Subtopic[]
+  createdAt DateTime   @default(now())
+}
+
+model Subtopic {
+  id        String  @id @default(cuid())
+  title     String
+  generated Boolean @default(false)
+  slug      String
+  topicId   String
+  topic     Topic   @relation(fields: [topicId], references: [id])
+  htmlPath  String
+  quizPath  String
+  error     String? // Mensaje de error si algo falló al generar
+
+  createdAt DateTime @default(now())
+}
+
+model Admin {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
