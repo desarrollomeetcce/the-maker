@@ -15,7 +15,7 @@ import {
     AccordionDetails,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { generateFullBookAction } from "@/app/book/application/Generate";
+import { generateFullBookAction } from "@/app/(logged)/book/application/Generate";
 
 interface TopicWithSubtopics {
     id: string;
