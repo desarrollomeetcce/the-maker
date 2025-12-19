@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 import bcrypt from 'bcrypt'
+import { redirect } from 'next/navigation'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key'
 
@@ -94,4 +95,15 @@ export async function getAuthUserId(): Promise<string> {
 
   const payload = verifyToken(token)
   return payload?.userId || ''
+}
+
+export async function requireAuthCookie() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token");
+
+  if (!token) {
+    redirect("/");
+  }
+
+  return token.value;
 }
