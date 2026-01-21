@@ -29,11 +29,11 @@ export default function LoginView() {
                 if (tab === 0) {
                     const { success } = await loginUser(email, password);
                     if (success) {
-                        window.location.href = "/home";
+                        window.location.href = "/ialibros/home";
                     }
                 } else {
                     await registerUser(email, password, name);
-                    window.location.href = "/";
+                    window.location.href = "/ialibros";
                 }
 
             } catch (err: any) {

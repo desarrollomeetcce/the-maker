@@ -229,7 +229,7 @@ const FullBookGenerator = () => {
                           </Button>
                         </Link>
                         <Link
-                          href={`/book/${topicId}`} // <-- corregido: debe usar topicId
+                          href={`/ialibros/book/${topicId}`} // <-- corregido: debe usar topicId
                           target="_blank"
                           rel="noopener noreferrer"
                           underline="hover"

@@ -34,7 +34,7 @@ export default function NavBar() {
 
         {/* Menú de navegación */}
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button color="inherit" onClick={() => router.push('/book')}>
+          <Button color="inherit" onClick={() => router.push('/ialibros/book')}>
             Crear Libro
           </Button>
           <Button color="inherit" onClick={() => router.push('/topics')}>
