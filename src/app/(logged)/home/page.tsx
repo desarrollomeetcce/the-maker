@@ -29,7 +29,7 @@ export default function HomePage() {
     {
       title: 'Crear Libro',
       description: 'Genera libros desde títulos y subtemas',
-      href: '/ialibros/book',
+      href: '/book',
     },
     {
       title: 'Mis Temas',

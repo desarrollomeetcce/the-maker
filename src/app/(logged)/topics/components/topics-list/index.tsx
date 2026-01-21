@@ -229,7 +229,7 @@ export default function TopicsList({ topics }: { topics: TopicWithSubtopics[] })
                                                         </Button>
                                                     </Link>
                                                     <Link
-                                                        href={'/ialibros/book/'+sub.topicId}
+                                                        href={'/book/'+sub.topicId}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         underline="hover"
