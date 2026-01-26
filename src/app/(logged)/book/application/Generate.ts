@@ -167,7 +167,7 @@ export async function insertContextualImagesAndStore(
 
     const imageFilename = `img-${bookId}-${topic.toLowerCase().replace(/[^\w\d]+/g, '-')}-${i + 1}.png`;
     const imagePath = path.join(imagesDir, imageFilename);
-    const publicPath = `/ialibros/generated/${bookId}/images/${imageFilename}`;
+    const publicPath = `/generated/${bookId}/images/${imageFilename}`;
 
     await writeFile(imagePath, buffer);
 
@@ -235,7 +235,7 @@ export async function generateFullBookAction(
 
   const filename = `${filenameSlug}.html`;
   const fullPath = path.join(baseDir, filename);
-  const publicPath = `/ialibros/generated/${bookId}/${filename}`;
+  const publicPath = `/generated/${bookId}/${filename}`;
 
   await mkdir(baseDir, { recursive: true });
 
@@ -435,7 +435,7 @@ export async function downloadImageToLocal(url: string, bookId: string, tomoSlug
   const buffer = await res.buffer();
   await writeFile(filePath, buffer);
 
-  return `/ialibros/generated/${bookId}/images/${fileName}`;
+  return `/generated/${bookId}/images/${fileName}`;
 }
 
 
@@ -532,7 +532,7 @@ export async function regenerateSubtopicAction(subtopicId: string) {
       where: { id: subtopicId },
       data: {
         generated: true,
-        htmlPath: `/ialibros/generated/${bookId}/${htmlFilename}`,
+        htmlPath: `/generated/${bookId}/${htmlFilename}`,
         quizPath: `/quiz/${bookId}/${quizFilename}`,
       },
     });
